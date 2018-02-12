@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dimen_five">5dp</dimen>
+    <dimen name="linear_image_content">250dp</dimen>
+    <dimen name="text_title_detail">20sp</dimen>
+    <dimen name="standart_content_detail">16sp</dimen>
+    <dimen name="one">1dp</dimen>
+    <dimen name="two">2dp</dimen>
+    <dimen name="dimen_ten">10dp</dimen>
+    <dimen name="dimen_twenty">20sp</dimen>
+    <dimen name="standart_content_detail_text">14sp</dimen>
+    <dimen name="dimen_sixty">16sp</dimen>
+    <dimen name="dimen_image_content">240dp</dimen>
+    <dimen name="fifty">50dp</dimen>
+    <dimen name="logo_dimen_lan">150dp</dimen>
+    <dimen name="logo_dimen_ver">75dp</dimen>
+</resources>

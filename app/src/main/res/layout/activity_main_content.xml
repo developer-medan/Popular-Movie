@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="bioskop.cari.aliagus.com.caribioskop.main_content.MainContentActivity">
+
+        <FrameLayout
+            android:id="@+id/frame_layout_content_activity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="?attr/actionBarSize"
+            />
+
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        android:background="#323232"
+        app:itemIconTint="@drawable/background_item_bottom_navigation_view"
+        app:itemTextColor="@drawable/background_item_bottom_navigation_view"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:menu="@menu/botton_navigation_menu" />
+</android.support.constraint.ConstraintLayout>

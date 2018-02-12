@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_info_outline_black_24dp"
+        android:id="@+id/about"
+        android:title="@string/about" />
+
+    <item
+        android:id="@+id/test"
+        android:icon="@drawable/ic_broken_image_gray_24dp"
+        android:title="db" />
+</menu>

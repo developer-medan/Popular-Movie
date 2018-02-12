@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">CariBioskop</string>
+    <string name="none" />
+    <string name="title_content">Title Content</string>
+    <string name="title_content_detail">THE COMMUTER</string>
+    <string name="duration_content_detail">Duration : </string>
+    <string name="genre_content_detail">Genre : </string>
+    <string name="synopsis_content_detail">Synopsis : </string>
+    <string name="synopsis_content_detail_ex">-</string>
+    <string name="top">Top Rated</string>
+    <string name="popular">Popular</string>
+    <string name="popular_movie">Popular Movie</string>
+    <string name="top_rated_movie">Top Rated Movie</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="about">About</string>
+    <string name="release">Release :</string>
+    <string name="rate">Rated :</string>
+</resources>

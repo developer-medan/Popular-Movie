@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/dimen_ten"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/linear_image_content"
+        android:id="@+id/relatif_layout_image_content"
+        android:background="@drawable/background_gradient"
+        android:elevation="@dimen/dimen_five"
+        >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/linear_image_content"
+            android:padding="1dp"
+            android:id="@+id/image_content"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fifty"
+        android:id="@+id/title_content"
+        android:hint="@string/title_content"
+        android:textSize="@dimen/dimen_sixty"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:background="@drawable/background_textview"
+        app:layout_constraintTop_toBottomOf="@+id/relatif_layout_image_content"
+        />
+
+
+</android.support.constraint.ConstraintLayout>

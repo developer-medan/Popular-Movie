@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ProgressDialogStyle" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="DialogSpotColor">@color/white</item>
+        <item name="DialogSpotCount">8</item>
+        <item name="DialogTitleText">@string/none</item>
+    </style>
+
+    <style name="AppThemeToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionMenuTextColor">#000000</item>
+        <item name="android:textColorPrimary">#fff</item>
+        <!--change icon back toolbar-->
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
+        <!--change icon drawable-->
+        <!--<item name="drawerArrowStyle">@style/DrawerStyle</item>-->
+        <!--<item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>-->
+    </style>
+
+    <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <color name="white">#fff</color>
+</resources>
