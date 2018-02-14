@@ -14,8 +14,7 @@
             android:layout_width="@dimen/logo_dimen_lan"
             android:layout_height="@dimen/logo_dimen_ver"
             android:src="@drawable/logo_one"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="parent"
+            android:layout_centerInParent="true"
             />
     </RelativeLayout>
 

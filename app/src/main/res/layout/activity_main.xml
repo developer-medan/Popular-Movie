@@ -7,4 +7,14 @@
     android:id="@+id/mainContainer"
     tools:context="bioskop.cari.aliagus.com.caribioskop.MainActivity">
 
+    <ImageView
+        android:layout_width="@dimen/linear_image_content"
+        android:layout_height="@dimen/linear_image_content"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        android:src="@drawable/ic_broken_image_gray_24dp"
+        />
+
 </android.support.constraint.ConstraintLayout>

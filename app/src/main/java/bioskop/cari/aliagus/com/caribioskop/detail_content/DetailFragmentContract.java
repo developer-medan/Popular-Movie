@@ -2,18 +2,23 @@ package bioskop.cari.aliagus.com.caribioskop.detail_content;
 
 import java.util.List;
 
+import bioskop.cari.aliagus.com.caribioskop.model.Movie;
+
 /**
  * Created by ali on 11/02/18.
  */
 
 public interface DetailFragmentContract {
     interface View {
+        void loadDataToView(List<String> listGenres, List<String> listPlayers);
 
-        void loadDataToView(List<String> listGenres);
+        void showToast();
     }
 
     interface Presenter {
-        void loadDataToView(android.view.View genresList);
+        void loadData(Movie movie);
+
+        void getDataTrailler(String id);
     }
 
 }

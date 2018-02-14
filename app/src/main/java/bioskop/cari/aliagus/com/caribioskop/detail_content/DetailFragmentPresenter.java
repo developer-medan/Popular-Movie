@@ -1,13 +1,21 @@
 package bioskop.cari.aliagus.com.caribioskop.detail_content;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.view.View;
+import android.content.Intent;
+import android.net.Uri;
 
 import java.util.List;
 
 import bioskop.cari.aliagus.com.caribioskop.database.DatabaseManagerHelper;
 import bioskop.cari.aliagus.com.caribioskop.lib.StringSource;
 import bioskop.cari.aliagus.com.caribioskop.model.Movie;
+import bioskop.cari.aliagus.com.caribioskop.utils.ProviderObservables;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by ali on 11/02/18.
@@ -18,6 +26,7 @@ public class DetailFragmentPresenter implements DetailFragmentContract.Presenter
     private DetailFragmentContract.View view;
     private Context context;
     DatabaseManagerHelper databaseManagerHelper;
+    ProviderObservables providerObservables;
 
     public DetailFragmentPresenter(DetailFragmentContract.View view, Context context) {
         this.view = view;
@@ -25,13 +34,82 @@ public class DetailFragmentPresenter implements DetailFragmentContract.Presenter
     }
 
     @Override
-    public void loadDataToView(View view) {
-        Movie movie = (Movie) view.getTag();
+    public void loadData(Movie movie) {
+        providerObservables = new ProviderObservables(context);
         databaseManagerHelper = DatabaseManagerHelper.getInstance(context);
-        List<String> listGenres = databaseManagerHelper.getListGenres(
+        final List<String> listGenres = databaseManagerHelper.getListGenres(
                 StringSource.colomnGenres,
                 movie.getGenresList()
         );
-        this.view.loadDataToView(listGenres);
+        Observable<List<String>> observableListPlayers = providerObservables.getObservablesListPlayers(movie.getId());
+        observableListPlayers
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<String>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<String> listPlayers) {
+                        view.loadDataToView(listGenres, listPlayers);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.loadDataToView(listGenres, null);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    @Override
+    public void getDataTrailler(String id) {
+        providerObservables = new ProviderObservables(context);
+        Observable<List<String>> observableTrailer = providerObservables.getObservableTrailer(id);
+        observableTrailer.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<String>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<String> keyList) {
+                        if (keyList.size() != 0) {
+                            for (String key : keyList) {
+                                Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+                                Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("http://www.youtube.com/watch?v=" + key));
+                                try {
+                                    context.startActivity(appIntent);
+                                    break;
+                                } catch (ActivityNotFoundException ex) {
+                                    context.startActivity(webIntent);
+                                    break;
+                                }
+                            }
+                        } else {
+                            onError(new Throwable(""));
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showToast();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 }

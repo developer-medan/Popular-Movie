@@ -1,6 +1,7 @@
 package bioskop.cari.aliagus.com.caribioskop.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,15 +30,69 @@ import okhttp3.Response;
  */
 
 public class ProviderObservables {
+    public static final int MOVIE_CONTENT = 1;
+    public static final int LOADING_CONTENT = 2;
     private static final String TAG = ProviderObservables.class.getSimpleName();
     private Context context;
     private DatabaseManagerHelper databaseManagerHelper;
-    public static final int MOVIE_CONTENT = 1;
-    public static final int LOADING_CONTENT = 2;
 
     public ProviderObservables(Context context) {
         this.context = context;
         databaseManagerHelper = DatabaseManagerHelper.getInstance(context);
+    }
+
+    public Observable<List<String>> getObservableTrailer(final String id) {
+        Log.d(TAG, "key" + id);
+        return Observable.create(new ObservableOnSubscribe<List<String>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<String>> emitter) throws Exception {
+                boolean isConnect = ConnectionProvider.networkStatus(context);
+                if (isConnect) {
+                    requestToGetAllTrailer(emitter, id);
+                } else {
+                    emitter.onError(new Throwable("You Have No Internet Connection..."));
+                }
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    private void requestToGetAllTrailer(final ObservableEmitter<List<String>> emitter, String id) {
+        Request request = new Request.Builder()
+                .url(StringSource.BASE_GET_TRAILLER_MOVIE + id + StringSource.GET_TRAILLER)
+                .build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .readTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .writeTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .build();
+        client.newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        emitter.onError(new Throwable(""));
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.code() == 200) {
+                            try {
+                                String responseMessage = response.body().string();
+                                JSONObject jsonObject = new JSONObject(responseMessage);
+                                JSONArray jsonArray = jsonObject.getJSONArray("results");
+                                List<String> listStringKey = new ArrayList<>();
+                                for (int a = 0; a < jsonArray.length(); a++) {
+                                    JSONObject jsonObjectItem = jsonArray.getJSONObject(a);
+                                    String key = jsonObjectItem.getString("key");
+                                    listStringKey.add(key);
+                                }
+                                emitter.onNext(listStringKey);
+                                emitter.onComplete();
+                            } catch (Exception ex) {
+                                emitter.onError(new Throwable(""));
+                            }
+                        }
+                    }
+                });
     }
 
     public Observable<HashMap<String, Object>> getObservableMovie(final String urlData) {
@@ -47,6 +102,8 @@ public class ProviderObservables {
                 boolean isConnect = ConnectionProvider.networkStatus(context);
                 if (isConnect) {
                     requestToGetAllMoviesNowPlaying(emitter, urlData);
+                } else {
+                    emitter.onError(new Throwable("You Have No Internet Connection..."));
                 }
             }
         }).subscribeOn(Schedulers.io());
@@ -103,6 +160,17 @@ public class ProviderObservables {
                                     listMovie.add(movie);
                                     listType.add(MOVIE_CONTENT);
                                 }
+
+                               /* Date currentDate = Calendar.getInstance().getTime();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                String currentDateString = sdf.format(currentDate);*/
+                                Long time = System.currentTimeMillis();
+                                String currentDateString = String.valueOf(time);
+                                databaseManagerHelper.insertToTbKV(
+                                        StringSource.colomnKeyValue,
+                                        StringSource.LAST_UPDATE,
+                                        currentDateString
+                                );
                                 List<Movie> listAllMovie = databaseManagerHelper.getAllMovieFromDatabase(
                                         StringSource.colomnMovie
                                 );
@@ -115,7 +183,7 @@ public class ProviderObservables {
                                 emitter.onNext(hasmap);
                                 emitter.onComplete();
                             } catch (Exception ex) {
-                                emitter.onError(ex);
+                                emitter.onError(new Throwable(""));
                             }
                         }
                     }
@@ -129,6 +197,8 @@ public class ProviderObservables {
                 boolean isConnect = ConnectionProvider.networkStatus(context);
                 if (isConnect) {
                     requestToGetAllGenres(emitter);
+                } else {
+                    emitter.onError(new Throwable("You Have No Internet Connection..."));
                 }
             }
         }).subscribeOn(Schedulers.io());
@@ -172,7 +242,65 @@ public class ProviderObservables {
                                 emitter.onNext("");
                                 emitter.onComplete();
                             } catch (Exception ex) {
-                                emitter.onError(ex);
+                                emitter.onError(new Throwable(""));
+                            }
+                        }
+                    }
+                });
+    }
+
+    public Observable<List<String>> getObservablesListPlayers(final String id) {
+        return Observable.create(new ObservableOnSubscribe<List<String>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<String>> emitter) throws Exception {
+                boolean isConnect = ConnectionProvider.networkStatus(context);
+                if (isConnect) {
+                    requestToGetAllPlayers(emitter, id);
+                } else {
+                    emitter.onError(new Throwable("You Have No Internet Connection..."));
+                }
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    private void requestToGetAllPlayers(final ObservableEmitter<List<String>> emitter, String id) {
+        final Request request = new Request.Builder()
+                .url(StringSource.BASE_GET_ALL_PLAYERS + id + StringSource.GET_ALL_PLAYERS)
+                .addHeader("Accept", "application/json")
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .readTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .writeTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .build();
+        client.newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        emitter.onError(e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responMessage = response.body().string();
+                        if (response.code() == 200) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(responMessage);
+                                JSONArray jsonArray = jsonObject.getJSONArray("cast");
+                                List<String> listPlayers = new ArrayList<>();
+                                for (int a = 0; a < jsonArray.length(); a++) {
+                                    JSONObject jsonObjectItem = jsonArray.getJSONObject(a);
+                                    String name = jsonObjectItem.getString("name");
+                                    String character = jsonObjectItem.getString("character");
+                                    String player = name + " as " + character;
+                                    listPlayers.add(player);
+                                }
+                                emitter.onNext(listPlayers);
+                                emitter.onComplete();
+                            } catch (Exception ex) {
+                                emitter.onError(new Throwable(""));
                             }
                         }
                     }

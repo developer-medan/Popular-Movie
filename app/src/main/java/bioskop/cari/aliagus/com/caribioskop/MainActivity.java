@@ -14,13 +14,15 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import bioskop.cari.aliagus.com.caribioskop.main_content.MainContentActivity;
+import bioskop.cari.aliagus.com.caribioskop.toast.ToastFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 
-public class MainActivity extends AppCompatActivity implements MainActivityContract.View{
+public class MainActivity extends AppCompatActivity implements MainActivityContract.View {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     MainActivityPresenter mPresenter;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     ConstraintLayout mConstraintLayout;
     private static final int PERMISSION_REQUEST_CODE = 101;
     private AlertDialog pDialog;
+    ToastFragment toastFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +40,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         ButterKnife.bind(this);
         hideNavigationBar();
         initPresenter();
-        initProgressDialog();
     }
 
     private void hideNavigationBar() {
-        mConstraintLayout = (ConstraintLayout)findViewById(R.id.mainContainer);
+        mConstraintLayout = (ConstraintLayout) findViewById(R.id.mainContainer);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mConstraintLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -83,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
             );
             return;
         } else {
-            pDialog.show();
             mPresenter.getAllGenresMovie();
         }
     }
@@ -103,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 }
             }
             if (isPermitted) {
-                pDialog.show();
                 mPresenter.getAllGenresMovie();
             } else {
                 moveTaskToBack(true);
@@ -115,21 +115,48 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     @Override
     protected void onResume() {
         super.onResume();
+        hideNavigationBar();
         checkPermission();
     }
 
     @Override
     public void jumpToMainContent() {
         toMainContent();
-        if (pDialog.isShowing()) {
-            pDialog.dismiss();
+    }
+
+    @Override
+    public void showToastFragment(String message) {
+        checkToasFragment();
+        toastFragment = ToastFragment.getInstance(getApplicationContext());
+        toastFragment.setMessage(message);
+        toastFragment.show(
+                getSupportFragmentManager(),
+                toastFragment.getTag()
+        );
+        toastFragment.setCancelable(false);
+    }
+
+    public void checkToasFragment() {
+        if (toastFragment != null && toastFragment.isAdded()) {
+            toastFragment.dismissAllowingStateLoss();
         }
     }
 
-    private void initProgressDialog() {
-        pDialog = new SpotsDialog(MainActivity.this, R.style.ProgressDialogStyle);
-        pDialog.setCancelable(true);
-        pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        pDialog.show();
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        finish();
+    }
+
+    public void resumeActivity() {
+        checkToasFragment();
+        onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        checkToasFragment();
     }
 }

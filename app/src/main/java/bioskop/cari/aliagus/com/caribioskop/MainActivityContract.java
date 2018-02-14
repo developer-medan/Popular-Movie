@@ -8,6 +8,8 @@ public interface MainActivityContract {
 
     interface View {
         void jumpToMainContent();
+
+        void showToastFragment(String message);
     }
 
     interface Presenter {

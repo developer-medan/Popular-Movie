@@ -5,8 +5,9 @@ package bioskop.cari.aliagus.com.caribioskop.main_content;
  */
 
 public interface MainContentContract {
-    interface View {
 
+    interface View {
+        void showToastFragment(String message);
     }
 
     interface Presenter {

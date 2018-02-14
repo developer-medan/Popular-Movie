@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import bioskop.cari.aliagus.com.caribioskop.R;
 import bioskop.cari.aliagus.com.caribioskop.about.About;
 import bioskop.cari.aliagus.com.caribioskop.database.InspectionDatabase;
-import bioskop.cari.aliagus.com.caribioskop.detail_content.DetailFragment;
+import bioskop.cari.aliagus.com.caribioskop.fragment_content.ContentMovieFragment;
 import bioskop.cari.aliagus.com.caribioskop.lib.StringSource;
-import bioskop.cari.aliagus.com.caribioskop.now_playing.NowPlayingFragment;
-import bioskop.cari.aliagus.com.caribioskop.top_rated.TopRatedFragment;
+import bioskop.cari.aliagus.com.caribioskop.toast.ToastFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -30,12 +29,13 @@ import butterknife.OnClick;
 public class MainContentActivity extends AppCompatActivity implements MainContentContract.View,
         View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-    MainContentActivityPresenter mPresenter;
+    private MainContentActivityPresenter mPresenter;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView mBottomNavigationView;
     private Menu menuNavBottom;
     boolean isMainContent = true;
     private About about;
+    private ToastFragment toastFragment;
 
 
     @Override
@@ -67,9 +67,9 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
                                     if (a == 0) {
                                         id = "bottom_navigation_now_playing";
                                     } else if (a == 1) {
-                                        id = "botton_navigation_top_rated";
-                                    } else if (a == 2) {
                                         id = "botton_navigation_popular";
+                                    } else if (a == 2) {
+                                        id = "botton_navigation_comming_soon";
                                     }
                                     MenuItem menuItem = menuNavBottom.findItem(getResources().getIdentifier(id, "id", getPackageName()));
                                     mBottomNavigationView.findViewsWithText(menuItems, menuItem.getTitle(), View.FIND_VIEWS_WITH_TEXT);
@@ -99,36 +99,32 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
     protected void onResume() {
         super.onResume();
         attachFagmentToActivity(StringSource.GET_NOW_PLAYING_MOVIE);
+        setTitle(R.string.now_playing);
+        mBottomNavigationView.setSelectedItemId(R.id.bottom_navigation_now_playing);
     }
 
     private void attachFagmentToActivity(String urlData) {
-        NowPlayingFragment nowPlayingFragment = new NowPlayingFragment();
-        nowPlayingFragment.setUrlData(urlData);
+        ContentMovieFragment contentMovieFragment = new ContentMovieFragment();
+        contentMovieFragment.setUrlData(urlData);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout_content_activity, nowPlayingFragment)
+                .replace(R.id.frame_layout_content_activity, contentMovieFragment)
                 .commitAllowingStateLoss();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.botton_navigation_top_rated:
-             //   attachFagmentToActivity();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout_content_activity, new TopRatedFragment())
-                        .commitAllowingStateLoss();
-                setTitle(R.string.top_rated_movie);
+            case R.id.botton_navigation_comming_soon:
+                attachFagmentToActivity(StringSource.GET_COMING_SOON_MOVIE);
+                setTitle(R.string.coming_soon);
                 isMainContent = true;
                 break;
 
             case R.id.botton_navigation_popular:
                 attachFagmentToActivity(StringSource.GET_POPULAR_MOVIE);
-            /*getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout_content_activity, new PopularFragment())
-                        .commitAllowingStateLoss();*/
                 setTitle(R.string.popular_movie);
                 isMainContent = true;
-            break;
+                break;
 
             case R.id.bottom_navigation_now_playing:
                 attachFagmentToActivity(StringSource.GET_NOW_PLAYING_MOVIE);
@@ -167,22 +163,34 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //if (isMainContent) {
-            moveTaskToBack(true);
-        /*} else {
-            attachFagmentToActivity();
-            isMainContent = true;
-        }*/
+        moveTaskToBack(true);
     }
 
-    public void showDetailMovie(View view) {
-        isMainContent = false;
-        DetailFragment detailFragment = new DetailFragment();
-        detailFragment.setMovie(view);
-        detailFragment.setContext(getApplicationContext());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout_content_activity, detailFragment)
-                .commitAllowingStateLoss();
+    @Override
+    public void showToastFragment(String message) {
+        toastFragment = ToastFragment.getInstance(getApplicationContext());
+        toastFragment.setMessage(message);
+        toastFragment.show(
+                getSupportFragmentManager(),
+                toastFragment.getTag()
+        );
+        toastFragment.setCancelable(false);
     }
 
+    public void resumeActivity() {
+        checkToastFragment();
+        onResume();
+    }
+
+    private void checkToastFragment() {
+        if (toastFragment != null && toastFragment.isAdded()) {
+            toastFragment.dismissAllowingStateLoss();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        checkToastFragment();
+    }
 }

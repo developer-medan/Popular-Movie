@@ -1,7 +1,6 @@
-package bioskop.cari.aliagus.com.caribioskop.now_playing;
+package bioskop.cari.aliagus.com.caribioskop.fragment_content;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +17,15 @@ import io.reactivex.schedulers.Schedulers;
  * Created by ali on 11/02/18.
  */
 
-public class NowPlayingFragmentPresenter implements NowPlayingContract.Presenter {
+public class ContentMovieFragmentPresenter implements ContentMovieFragmentContract.Presenter {
 
-    private static final String TAG = NowPlayingFragmentPresenter.class.getSimpleName();
-    private NowPlayingContract.View view;
+    private static final String TAG = ContentMovieFragmentPresenter.class.getSimpleName();
+    private ContentMovieFragmentContract.View view;
     private Context context;
     private ProviderObservables providerObservables;
 
 
-    public NowPlayingFragmentPresenter(NowPlayingContract.View view, Context context) {
+    public ContentMovieFragmentPresenter(ContentMovieFragmentContract.View view, Context context) {
         this.view = view;
         this.context = context;
         providerObservables = new ProviderObservables(context);
@@ -46,14 +45,14 @@ public class NowPlayingFragmentPresenter implements NowPlayingContract.Presenter
                     @Override
                     public void onNext(HashMap<String, Object> map) {
                         view.loadDataToAdapter(
-                                (List<Movie>)map.get("listMovie"),
-                                (List<Integer>)map.get("listType")
+                                (List<Movie>) map.get("listMovie"),
+                                (List<Integer>) map.get("listType")
                         );
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("error", "error");
+                        if (e != null) view.showToastFragment(e.getMessage());
                     }
 
                     @Override

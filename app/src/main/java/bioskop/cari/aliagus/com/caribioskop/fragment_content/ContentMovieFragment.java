@@ -1,4 +1,4 @@
-package bioskop.cari.aliagus.com.caribioskop.now_playing;
+package bioskop.cari.aliagus.com.caribioskop.fragment_content;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import bioskop.cari.aliagus.com.caribioskop.R;
 import bioskop.cari.aliagus.com.caribioskop.adapter.adapter_content.AdapterContentMovie;
+import bioskop.cari.aliagus.com.caribioskop.detail_content.DetailFragment;
 import bioskop.cari.aliagus.com.caribioskop.main_content.MainContentActivity;
 import bioskop.cari.aliagus.com.caribioskop.model.Movie;
 import butterknife.BindView;
@@ -28,31 +29,32 @@ import dmax.dialog.SpotsDialog;
  * Created by ali on 11/02/18.
  */
 
-public class NowPlayingFragment extends Fragment implements NowPlayingContract.View, AdapterContentMovie.ListenerAdapterContentMovie {
+public class ContentMovieFragment extends Fragment implements ContentMovieFragmentContract.View, AdapterContentMovie.ListenerAdapterContentMovie {
 
-    private static final String TAG = NowPlayingFragment.class.getSimpleName();
+    private static final String TAG = ContentMovieFragment.class.getSimpleName();
     View view;
-    NowPlayingFragmentPresenter mPresenter;
+    ContentMovieFragmentPresenter mPresenter;
     AdapterContentMovie adapterContentMovie;
     @BindView(R.id.recycler_now_playing)
     RecyclerView recyclerView_now_playing;
     Context context;
     AlertDialog pDialog;
     private String urlData;
+    DetailFragment detailFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        initProgressDialog();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_now_playing, null);
+        view = inflater.inflate(R.layout.fragment_movie_content, null);
         ButterKnife.bind(this, view);
-        mPresenter = new NowPlayingFragmentPresenter(this, getContext());
+        mPresenter = new ContentMovieFragmentPresenter(this, getContext());
+        initProgressDialog();
         return view;
     }
 
@@ -70,8 +72,14 @@ public class NowPlayingFragment extends Fragment implements NowPlayingContract.V
         recyclerView_now_playing.setLayoutManager(gridLayoutManager);
         recyclerView_now_playing.addItemDecoration(dividerItemDecoration);
         recyclerView_now_playing.setAdapter(adapterContentMovie);
-        if (pDialog.isShowing()) {
-            pDialog.dismiss();
+        checkProgressDialog();
+    }
+
+    @Override
+    public void showToastFragment(String message) {
+        if (getActivity() != null) {
+            ((MainContentActivity) getActivity()).showToastFragment(message);
+            checkProgressDialog();
         }
     }
 
@@ -83,8 +91,15 @@ public class NowPlayingFragment extends Fragment implements NowPlayingContract.V
 
     @Override
     public void onHolderClick(View view) {
-        ((MainContentActivity) getActivity()).showDetailMovie(view);
+        detailFragment = new DetailFragment();
+        detailFragment.setMovie(view);
+        detailFragment.setContext(getContext());
+        detailFragment.show(
+                getFragmentManager(),
+                detailFragment.getTag()
+        );
     }
+
     private void initProgressDialog() {
         pDialog = new SpotsDialog(getContext(), R.style.ProgressDialogStyle);
         pDialog.setCancelable(true);
@@ -94,5 +109,17 @@ public class NowPlayingFragment extends Fragment implements NowPlayingContract.V
 
     public void setUrlData(String urlData) {
         this.urlData = urlData;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        checkProgressDialog();
+    }
+
+    public void checkProgressDialog() {
+        if (pDialog != null && pDialog.isShowing()) {
+            pDialog.dismiss();
+        }
     }
 }

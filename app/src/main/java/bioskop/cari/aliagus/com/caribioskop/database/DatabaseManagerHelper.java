@@ -1,9 +1,11 @@
 package bioskop.cari.aliagus.com.caribioskop.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -17,7 +19,7 @@ import bioskop.cari.aliagus.com.caribioskop.model.Movie;
  * Created by ali on 11/02/18.
  */
 
-public class DatabaseManagerHelper extends DatabaseHelper{
+public class DatabaseManagerHelper extends DatabaseHelper {
 
     private static final String TAG = DatabaseManagerHelper.class.getSimpleName();
     DatabaseManager databaseManager;
@@ -172,7 +174,7 @@ public class DatabaseManagerHelper extends DatabaseHelper{
         SQLiteDatabase sqLiteDatabase = databaseManager.openDatabase(TAG);
         String selectQuery = "SELECT * FROM " + arrayColomn[0];
         Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
-        List<String> listId= new ArrayList<>();
+        List<String> listId = new ArrayList<>();
         if (cursor.getCount() > 0) {
             if (cursor.moveToFirst()) {
                 do {
@@ -198,5 +200,68 @@ public class DatabaseManagerHelper extends DatabaseHelper{
             cursor.close();
         }
         return listGenres;
+    }
+
+    public String getRowTbKV(
+            String[] arrayStrings,
+            String lastUpdate
+    ) {
+        SQLiteDatabase db = databaseManager.openDatabase(TAG);
+        String selectQuery = "SELECT * FROM " + arrayStrings[0] + " WHERE "
+                + arrayStrings[1] + " = '" + lastUpdate + "'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        String value = "";
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            value = cursor.getString(cursor.getColumnIndex(arrayStrings[2]));
+        }
+        cursor.close();
+        return value;
+    }
+
+    public void insertToTbKV(
+            String[] arrayStrings,
+            String lastUpdate,
+            String currentDateString
+    ) {
+        SQLiteDatabase db = databaseManager.openDatabase(TAG);
+        ContentValues cv = new ContentValues();
+        cv.put(arrayStrings[1], lastUpdate);
+        cv.put(arrayStrings[2], currentDateString);
+        String date = getRowTbKV(arrayStrings, lastUpdate);
+        if (date.equals("")) {
+            db.insert(arrayStrings[0], null, cv);
+        } else if (!date.equals(currentDateString)) {
+            Log.d("waktu", date);
+            Log.d("waktu now", currentDateString);
+            Long time = Long.valueOf(date);
+            Long now = Long.valueOf(currentDateString);
+            Long timeNow = now - time;
+            Log.d("waktu time now", String.valueOf(timeNow));
+            if (timeNow >= 600000) {
+                deleteRowTableById(StringSource.colomnMovie);
+                String where = arrayStrings[1] + " = ?";
+                String[] args = {lastUpdate};
+                db.update(arrayStrings[0], cv, where, args);
+
+            }
+        }
+
+    }
+
+    private void deleteRowTableById(String[] arrayStrings) {
+        List<String> listId = getListId(arrayStrings);
+        if (listId.size() > 0) {
+            for (String id : listId) {
+                deleteRow(id, arrayStrings);
+            }
+        }
+    }
+
+    private void deleteRow(String id, String[] arrayStrings) {
+        SQLiteDatabase sqLiteOpenHelper = databaseManager.openDatabase(TAG);
+        String where = arrayStrings[1] + "= ?";
+        String[] args = {id};
+        sqLiteOpenHelper.delete(arrayStrings[0], where, args);
     }
 }

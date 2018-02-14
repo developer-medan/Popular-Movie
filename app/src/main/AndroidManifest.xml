@@ -23,7 +23,6 @@
         </activity>
         <activity android:name=".main_content.MainContentActivity" />
         <activity android:name=".database.InspectionDatabase" />
-        <activity android:name=".about.About"></activity>
     </application>
 
 </manifest>

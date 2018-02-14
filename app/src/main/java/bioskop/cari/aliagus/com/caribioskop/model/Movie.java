@@ -1,12 +1,13 @@
 package bioskop.cari.aliagus.com.caribioskop.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by ali on 11/02/18.
  */
 
-public class Movie {
+public class Movie implements Serializable{
     String id;
     String voteAverage;
     String title;

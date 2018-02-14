@@ -6,24 +6,23 @@ package bioskop.cari.aliagus.com.caribioskop.lib;
 
 public class StringSource {
     public static final String BASE_URL = "https://api.themoviedb.org/3/";
-    public static final String API_KEY = "api_key=e685a7fe7a4fe13cbd60d0d7432ad5b0";
+    public static final String API_KEY = "api_key=/*ganti dengan api key anda disini*/";
     public static final String GET_ALL_GENRES = BASE_URL + "genre/movie/list?" + API_KEY + "&language=en-In";
-    public static final String GENRE_ID = "28";
-    public static final String GET_MOVIE_LIST_BY_GENRE_ID = BASE_URL +
-            "genre/" + GENRE_ID + "/movies?" + API_KEY +
-            "&language=en-US&include_adult=false&sort_by=created_at.asc";
-    public static final String MOVIE_ID = "3";
     public static final String LEANGUAGE = "&language=en-US";
-    public static final String GET_DETAIL_MOVIE_BY_ID = BASE_URL + "movie/" + MOVIE_ID + "?" + API_KEY + LEANGUAGE;
-    /*BASE_URL + "/movie/" + input id movie id + "?" + API_KEY+ "&language=en-US"*/
-    public static final String GET_NOW_PLAYING_MOVIE = BASE_URL+"movie/now_playing?" + API_KEY + "&language=en-US&page=1&region=ID";
+    public static final String GET_NOW_PLAYING_MOVIE = BASE_URL + "movie/now_playing?" + API_KEY + "&language=en-ID&page=1&region=ID";
     public static final String GET_POPULAR_MOVIE = BASE_URL + "discover/movie?" + API_KEY +
             "&language=en-US&region=ID&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&year=2018";
-
-    //https://image.tmdb.org/t/p/w500/kqjL17yufvn9OVLyXYpvtyrFfak.jpg
+    public static final String GET_COMING_SOON_MOVIE = BASE_URL + "movie/upcoming?" + API_KEY + "&language=en-US&page=1&region=ID%7CUS";
+    public static final String BASE_GET_TRAILLER_MOVIE = BASE_URL + "movie/";
+    public static final String GET_TRAILLER = "/videos?" + API_KEY + "&language=en-US";
     public static final String GET_IMAGE_MOVIE = "https://image.tmdb.org/t/p/";
     public static final String SIZE_IMAGE_ADAPTER = "w300";
     public static final String SIZE_IMAGE_DETAIL = "w500";
+    public static final String BASE_GET_ALL_PLAYERS = BASE_URL+"movie/";
+    public static final String GET_ALL_PLAYERS = "/credits?" + API_KEY;
+
+    public static final String LAST_UPDATE = "lastUpdate";
+
     //keyValue
     public static final String TABLE_KEY_VALUE = "_kv";
     public static final String COL_KEY = "_key";

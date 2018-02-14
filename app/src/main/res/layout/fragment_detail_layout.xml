@@ -3,33 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/container_detail"
     android:background="@color/gray_old"
-
     >
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
 
             <LinearLayout
                 android:id="@+id/linear_head_content_detail"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/linear_image_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/linear_image_content"
                 android:orientation="horizontal"
                 android:padding="@dimen/dimen_five"
                 app:layout_constraintTop_toBottomOf="parent">
 
-                <ImageView
-                    android:id="@+id/image_content_detail"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="@integer/weight_one"
-                    android:padding="@dimen/dimen_five"
-                    android:background="@drawable/ic_broken_image_gray_24dp" />
+                    >
+                    <ProgressBar
+                        android:layout_width="@dimen/fifty"
+                        android:layout_height="@dimen/fifty"
+                        android:id="@+id/progress_image_loading"
+                        android:layout_centerInParent="true"
+                        />
+
+                    <ImageView
+                        android:id="@+id/image_content_detail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:maxHeight="@dimen/linear_image_content"
+                        android:padding="@dimen/dimen_five"
+                        />
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -48,6 +64,12 @@
                         android:gravity="center"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/one"
+                        android:background="@android:color/white"
+                        android:layout_margin="@dimen/one"
+                        />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -154,7 +176,30 @@
                             />
 
                     </LinearLayout>
-
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_ten"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/trailler"
+                            android:textSize="@dimen/standart_content_detail_text"
+                            android:textColor="@android:color/white"
+                            android:layout_centerHorizontal="true"
+                            android:id="@+id/txt_trailer"
+                            />
+                        <ImageView
+                            android:layout_width="@dimen/fifty"
+                            android:layout_height="@dimen/fifty"
+                            android:id="@+id/image_trailler"
+                            android:layout_below="@+id/txt_trailer"
+                            android:layout_centerHorizontal="true"
+                            android:background="@drawable/background_textview"
+                            android:src="@drawable/ic_play_arrow_white_24dp"
+                            />
+                    </RelativeLayout>
                 </LinearLayout>
 
             </LinearLayout>
@@ -164,12 +209,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/one"
                 android:background="@android:color/white"
-                android:paddingLeft="@dimen/dimen_five"
-                android:paddingRight="@dimen/dimen_five"
-                app:layout_constraintTop_toBottomOf="@+id/linear_head_content_detail" />
+                android:layout_margin="@dimen/dimen_five"
+                />
 
             <LinearLayout
-                android:id="@+id/linear_body_content_detail"
+                android:id="@+id/linear_body_content_detail_players"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -180,10 +224,35 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="@integer/weight_one"
+                    android:text="@string/players_content_detail"
+                    android:textSize="@dimen/standart_content_detail"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/text_players_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="@integer/weight_two"
+                    android:textColor="@android:color/white"
+                    android:hint="@string/synopsis_content_detail_ex" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/linear_body_content_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen_five"
+                app:layout_constraintTop_toBottomOf="@+id/linear_body_content_detail_players">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="@integer/weight_one"
                     android:text="@string/synopsis_content_detail"
                     android:textSize="@dimen/standart_content_detail"
                     android:textColor="@android:color/white"
-
                     android:textStyle="bold" />
 
                 <TextView
@@ -196,7 +265,7 @@
 
             </LinearLayout>
 
-        </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
 
     </ScrollView>
 

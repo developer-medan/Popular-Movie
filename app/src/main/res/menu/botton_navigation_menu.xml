@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/bottom_navigation_now_playing"
-        android:icon="@drawable/ic_play_circle_outline_gray_24dp"
+        android:icon="@drawable/ic_play_circle_outline_white_24dp"
         android:title="@string/now_playing"
-        />
-
-    <item
-        android:id="@+id/botton_navigation_top_rated"
-        android:icon="@drawable/ic_star_white_24dp"
-        android:title="@string/top"
         />
 
     <item
         android:id="@+id/botton_navigation_popular"
         android:icon="@drawable/ic_favorite_white_24dp"
         android:title="@string/popular" />
+
+    <item
+        android:id="@+id/botton_navigation_comming_soon"
+        android:icon="@drawable/ic_star_white_24dp"
+        android:title="@string/top"
+        />
 
 </menu>

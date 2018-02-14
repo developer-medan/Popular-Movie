@@ -1,7 +1,6 @@
 package bioskop.cari.aliagus.com.caribioskop;
 
 import android.content.Context;
-import android.util.Log;
 
 import bioskop.cari.aliagus.com.caribioskop.utils.ProviderObservables;
 import io.reactivex.Observable;
@@ -44,8 +43,7 @@ public class MainActivityPresenter implements MainActivityContract.Presenter{
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("testingsss1111", "errer");
-
+                        view.showToastFragment(e.getMessage());
                     }
 
                     @Override
