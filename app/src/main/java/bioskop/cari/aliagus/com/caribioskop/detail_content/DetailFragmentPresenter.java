@@ -5,6 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import bioskop.cari.aliagus.com.caribioskop.database.DatabaseManagerHelper;
@@ -41,24 +46,34 @@ public class DetailFragmentPresenter implements DetailFragmentContract.Presenter
                 StringSource.colomnGenres,
                 movie.getGenresList()
         );
-        Observable<List<String>> observableListPlayers = providerObservables.getObservablesListPlayers(movie.getId());
+        List<String> listId = databaseManagerHelper.getListId(StringSource.colomnFavorites);
+        final boolean isFavorite = listId.contains(movie.getId());
+        Observable<JSONObject> observableListPlayers = providerObservables.getObservablesListPlayers(movie.getId());
         observableListPlayers
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<String>>() {
+                .subscribe(new Observer<JSONObject>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(List<String> listPlayers) {
-                        view.loadDataToView(listGenres, listPlayers);
+                    public void onNext(JSONObject jsonObjectData) {
+                        List<String> listPlayers = new ArrayList<>();
+                        String duration = "0";
+                        try {
+                            listPlayers = (List<String>) jsonObjectData.get("listPlayers");
+                            duration = jsonObjectData.getString("duration");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        view.loadDataToView(listGenres, listPlayers, duration, isFavorite);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        view.loadDataToView(listGenres, null);
+                        view.loadDataToView(listGenres, null, "0", isFavorite);
                     }
 
                     @Override
@@ -66,6 +81,7 @@ public class DetailFragmentPresenter implements DetailFragmentContract.Presenter
 
                     }
                 });
+
     }
 
     @Override
@@ -111,5 +127,34 @@ public class DetailFragmentPresenter implements DetailFragmentContract.Presenter
                     }
                 });
 
+    }
+
+    @Override
+    public void addOrRemoveMovie(Movie movie, int codeMovie) {
+        providerObservables = new ProviderObservables(context);
+        Observable<HashMap<String, Object>> observable = providerObservables.saveMovieToFavoriteDatabase(
+                movie,
+                codeMovie,
+                ""
+        );
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<HashMap<String, Object>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(HashMap<String, Object> map) {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
     }
 }

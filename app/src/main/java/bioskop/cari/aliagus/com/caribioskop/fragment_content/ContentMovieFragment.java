@@ -10,9 +10,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import java.util.List;
 
@@ -29,18 +31,24 @@ import dmax.dialog.SpotsDialog;
  * Created by ali on 11/02/18.
  */
 
-public class ContentMovieFragment extends Fragment implements ContentMovieFragmentContract.View, AdapterContentMovie.ListenerAdapterContentMovie {
+public class ContentMovieFragment extends Fragment implements ContentMovieFragmentContract.View,
+        AdapterContentMovie.ListenerAdapterContentMovie {
 
     private static final String TAG = ContentMovieFragment.class.getSimpleName();
+    private static final int ADD_MOVIE = 1;
+    private static final int REMOVE_MOVIE = 2;
     View view;
     ContentMovieFragmentPresenter mPresenter;
     AdapterContentMovie adapterContentMovie;
     @BindView(R.id.recycler_now_playing)
     RecyclerView recyclerView_now_playing;
+    @BindView(R.id.fragment_content_movie_logo)
+    RelativeLayout relativeLayoutLogo;
     Context context;
     AlertDialog pDialog;
     private String urlData;
     DetailFragment detailFragment;
+    private String filter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,22 +63,29 @@ public class ContentMovieFragment extends Fragment implements ContentMovieFragme
         ButterKnife.bind(this, view);
         mPresenter = new ContentMovieFragmentPresenter(this, getContext());
         initProgressDialog();
+        mPresenter.loadData(urlData, filter);
+        Log.d(TAG, "created");
         return view;
     }
 
     @Override
     public void loadDataToAdapter(
             List<Movie> movieList,
-            List<Integer> listType
-    ) {
+            List<Integer> listType,
+            String message) {
         int colomn = 2;
+        if (message != null) {
+            showToastFragment(message);
+        }
+        checkMovieList(movieList);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(context, colomn);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         adapterContentMovie = new AdapterContentMovie(movieList, listType, this);
         adapterContentMovie.setContext(getContext());
+        adapterContentMovie.setFilter(filter);
         recyclerView_now_playing.setHasFixedSize(true);
         recyclerView_now_playing.setLayoutManager(gridLayoutManager);
-        recyclerView_now_playing.addItemDecoration(dividerItemDecoration);
+        //recyclerView_now_playing.addItemDecoration(dividerItemDecoration);
         recyclerView_now_playing.setAdapter(adapterContentMovie);
         checkProgressDialog();
     }
@@ -84,9 +99,19 @@ public class ContentMovieFragment extends Fragment implements ContentMovieFragme
     }
 
     @Override
+    public void refreshAdapter(List<Movie> listMovie, List<Integer> listTypes) {
+        checkMovieList(listMovie);
+        adapterContentMovie.refresh(listMovie, listTypes);
+    }
+
+    @Override
+    public void refreshAdapterPosition(Integer position) {
+        adapterContentMovie.refreshPosition(position);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        mPresenter.loadData(urlData);
     }
 
     @Override
@@ -98,6 +123,23 @@ public class ContentMovieFragment extends Fragment implements ContentMovieFragme
                 getFragmentManager(),
                 detailFragment.getTag()
         );
+    }
+
+    @Override
+    public void onImageFavoriteWhiteNotFull(View view) {
+        mPresenter.saveOrRemoveMovieToFavorite(
+                view,
+                ADD_MOVIE,
+                filter
+        );
+    }
+
+    @Override
+    public void onImageFavoriteWhiteFull(View view) {
+        mPresenter.saveOrRemoveMovieToFavorite(
+                view,
+                REMOVE_MOVIE,
+                filter);
     }
 
     private void initProgressDialog() {
@@ -120,6 +162,18 @@ public class ContentMovieFragment extends Fragment implements ContentMovieFragme
     public void checkProgressDialog() {
         if (pDialog != null && pDialog.isShowing()) {
             pDialog.dismiss();
+        }
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    private void checkMovieList(List<Movie> movieList) {
+        if (movieList.size() == 0) {
+            relativeLayoutLogo.setVisibility(View.VISIBLE);
+        } else {
+            relativeLayoutLogo.setVisibility(View.GONE);
         }
     }
 }

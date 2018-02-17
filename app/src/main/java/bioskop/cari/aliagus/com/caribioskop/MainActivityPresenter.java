@@ -52,4 +52,5 @@ public class MainActivityPresenter implements MainActivityContract.Presenter{
                     }
                 });
     }
+
 }

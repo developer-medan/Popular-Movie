@@ -2,4 +2,7 @@
 <resources>
     <integer name="weight_two">2</integer>
     <integer name="weight_one">1</integer>
+    <integer name="weight_three">3</integer>
+    <integer name="weight_fourth">4</integer>
+    <integer name="key_position">1</integer>
 </resources>

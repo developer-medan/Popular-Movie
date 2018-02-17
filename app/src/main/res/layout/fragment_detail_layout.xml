@@ -9,7 +9,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,8 +42,7 @@
                     <ImageView
                         android:id="@+id/image_content_detail"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:maxHeight="@dimen/linear_image_content"
+                        android:layout_height="@dimen/linear_image_content"
                         android:padding="@dimen/dimen_five"
                         />
                 </RelativeLayout>
@@ -102,7 +102,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/dimen_five"
+                        android:layout_marginTop="@dimen/two"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/dimen_five"
+                        android:layout_marginTop="@dimen/two"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -154,7 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/dimen_five"
+                        android:layout_marginTop="@dimen/two"
                         >
                         <TextView
                             android:layout_width="wrap_content"
@@ -181,6 +181,25 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dimen_ten"
                         >
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/image_favorite_detail_not_full"
+                            android:src="@drawable/ic_favorite_white_not_full24dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentTop="true"
+                            />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/image_favorite_detail_full"
+                            android:src="@drawable/ic_favorite_white_full_24dp"
+                            android:visibility="gone"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentTop="true"
+                            />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

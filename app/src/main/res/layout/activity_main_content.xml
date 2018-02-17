@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="bioskop.cari.aliagus.com.caribioskop.main_content.MainContentActivity">
 
-        <FrameLayout
+    <FrameLayout
             android:id="@+id/frame_layout_content_activity"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -14,8 +14,6 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="?attr/actionBarSize"
             />
-
-
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
         android:layout_width="match_parent"

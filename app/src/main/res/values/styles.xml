@@ -10,7 +10,7 @@
 
     <style name="ProgressDialogStyle" parent="android:Theme.DeviceDefault.Dialog">
         <item name="DialogSpotColor">@color/white</item>
-        <item name="DialogSpotCount">8</item>
+        <item name="DialogSpotCount">7</item>
         <item name="DialogTitleText">@string/none</item>
     </style>
 

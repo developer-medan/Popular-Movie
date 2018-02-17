@@ -115,7 +115,9 @@ public class ToastFragment extends BottomSheetDialogFragment implements View.OnC
 
             case R.id.txt_cancel:
                 dismissAllowingStateLoss();
-                getActivity().onBackPressed();
+                if (getActivity().getClass().equals(MainActivity.class)) {
+                    getActivity().onBackPressed();
+                }
                 break;
         }
     }

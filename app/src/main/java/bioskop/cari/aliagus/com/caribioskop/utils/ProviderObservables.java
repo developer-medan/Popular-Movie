@@ -1,7 +1,6 @@
 package bioskop.cari.aliagus.com.caribioskop.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +41,6 @@ public class ProviderObservables {
     }
 
     public Observable<List<String>> getObservableTrailer(final String id) {
-        Log.d(TAG, "key" + id);
         return Observable.create(new ObservableOnSubscribe<List<String>>() {
             @Override
             public void subscribe(final ObservableEmitter<List<String>> emitter) throws Exception {
@@ -58,7 +56,7 @@ public class ProviderObservables {
 
     private void requestToGetAllTrailer(final ObservableEmitter<List<String>> emitter, String id) {
         Request request = new Request.Builder()
-                .url(StringSource.BASE_GET_TRAILLER_MOVIE + id + StringSource.GET_TRAILLER)
+                .url(StringSource.BASE_GET_MOVIE + id + StringSource.GET_TRAILLER)
                 .build();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(1000 * 180, TimeUnit.MILLISECONDS)
@@ -95,21 +93,49 @@ public class ProviderObservables {
                 });
     }
 
-    public Observable<HashMap<String, Object>> getObservableMovie(final String urlData) {
+    public Observable<HashMap<String, Object>> getObservableMovie(final String urlData, final String filter) {
         return Observable.create(new ObservableOnSubscribe<HashMap<String, Object>>() {
             @Override
             public void subscribe(ObservableEmitter<HashMap<String, Object>> emitter) throws Exception {
                 boolean isConnect = ConnectionProvider.networkStatus(context);
-                if (isConnect) {
-                    requestToGetAllMoviesNowPlaying(emitter, urlData);
+                String message = "Please check your Internet Connection...";
+                if (isConnect && !filter.equals("favorite")) {
+                    requestToGetAllMovies(emitter, urlData, filter);
                 } else {
-                    emitter.onError(new Throwable("You Have No Internet Connection..."));
+                    String[] arrayStringColomn = new String[0];
+                    if (filter.equals("now")) {
+                        arrayStringColomn = StringSource.colomnMovieNowPlaying;
+                    } else if (filter.equals("popular")) {
+                        arrayStringColomn = StringSource.colomnMoviePopular;
+                    } else if (filter.equals("soon")) {
+                        arrayStringColomn = StringSource.colomnMovieComingSoon;
+                    } else if (filter.equals("favorite")) {
+                        arrayStringColomn = StringSource.colomnFavorites;
+                        message = null;
+                    }
+                    List<Movie> listAllMovie = databaseManagerHelper.getAllMovieFromDatabase(
+                            arrayStringColomn
+                    );
+                    List<Integer> listType = new ArrayList<>();
+                    for (Movie movie : listAllMovie) {
+                        listType.add(MOVIE_CONTENT);
+                    }
+                    HashMap<String, Object> hasmap = new HashMap<>();
+                    hasmap.put("listMovie", listAllMovie);
+                    hasmap.put("listType", listType);
+                    hasmap.put("message", message);
+                    emitter.onNext(hasmap);
+                    emitter.onComplete();
                 }
             }
         }).subscribeOn(Schedulers.io());
     }
 
-    private void requestToGetAllMoviesNowPlaying(final ObservableEmitter<HashMap<String, Object>> emitter, String urlData) {
+    private void requestToGetAllMovies(
+            final ObservableEmitter<HashMap<String, Object>> emitter,
+            String urlData,
+            final String filter
+    ) {
         final Request request = new Request.Builder()
                 .url(urlData)
                 .addHeader("Accept", "application/json")
@@ -161,21 +187,25 @@ public class ProviderObservables {
                                     listType.add(MOVIE_CONTENT);
                                 }
 
-                               /* Date currentDate = Calendar.getInstance().getTime();
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                String currentDateString = sdf.format(currentDate);*/
-                                Long time = System.currentTimeMillis();
-                                String currentDateString = String.valueOf(time);
-                                databaseManagerHelper.insertToTbKV(
-                                        StringSource.colomnKeyValue,
-                                        StringSource.LAST_UPDATE,
-                                        currentDateString
-                                );
+                                String[] arrayStringColomn = new String[0];
+                                if (filter.equals("now")) {
+                                    arrayStringColomn = StringSource.colomnMovieNowPlaying;
+                                } else if (filter.equals("popular")) {
+                                    arrayStringColomn = StringSource.colomnMoviePopular;
+                                } else if (filter.equals("soon")) {
+                                    arrayStringColomn = StringSource.colomnMovieComingSoon;
+                                }
+
                                 List<Movie> listAllMovie = databaseManagerHelper.getAllMovieFromDatabase(
-                                        StringSource.colomnMovie
+                                        arrayStringColomn
                                 );
                                 if (listAllMovie.size() == 0) {
-                                    databaseManagerHelper.bulkInsertMovieToDatabase(listMovie);
+                                    databaseManagerHelper.bulkInsertMovieToDatabase(listMovie, arrayStringColomn);
+                                } else {
+                                    databaseManagerHelper.insertMovieToDatabase(
+                                            arrayStringColomn,
+                                            listMovie
+                                    );
                                 }
                                 HashMap<String, Object> hasmap = new HashMap<>();
                                 hasmap.put("listMovie", listMovie);
@@ -239,6 +269,13 @@ public class ProviderObservables {
                                 if (listId.size() == 0) {
                                     databaseManagerHelper.bulkInsertGenresToDatabase(listJsonGenres);
                                 }
+                                Long time = System.currentTimeMillis();
+                                String currentDateString = String.valueOf(time);
+                                databaseManagerHelper.insertToTbKV(
+                                        StringSource.colomnKeyValue,
+                                        StringSource.LAST_UPDATE,
+                                        currentDateString
+                                );
                                 emitter.onNext("");
                                 emitter.onComplete();
                             } catch (Exception ex) {
@@ -249,10 +286,10 @@ public class ProviderObservables {
                 });
     }
 
-    public Observable<List<String>> getObservablesListPlayers(final String id) {
-        return Observable.create(new ObservableOnSubscribe<List<String>>() {
+    public Observable<JSONObject> getObservablesListPlayers(final String id) {
+        return Observable.create(new ObservableOnSubscribe<JSONObject>() {
             @Override
-            public void subscribe(ObservableEmitter<List<String>> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<JSONObject> emitter) throws Exception {
                 boolean isConnect = ConnectionProvider.networkStatus(context);
                 if (isConnect) {
                     requestToGetAllPlayers(emitter, id);
@@ -263,9 +300,9 @@ public class ProviderObservables {
         }).subscribeOn(Schedulers.io());
     }
 
-    private void requestToGetAllPlayers(final ObservableEmitter<List<String>> emitter, String id) {
+    private void requestToGetAllPlayers(final ObservableEmitter<JSONObject> emitter, final String id) {
         final Request request = new Request.Builder()
-                .url(StringSource.BASE_GET_ALL_PLAYERS + id + StringSource.GET_ALL_PLAYERS)
+                .url(StringSource.BASE_GET_MOVIE + id + StringSource.GET_ALL_PLAYERS)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-Type", "application/json")
                 .build();
@@ -290,14 +327,85 @@ public class ProviderObservables {
                                 JSONObject jsonObject = new JSONObject(responMessage);
                                 JSONArray jsonArray = jsonObject.getJSONArray("cast");
                                 List<String> listPlayers = new ArrayList<>();
+                                JSONObject jsonObjectData = new JSONObject();
                                 for (int a = 0; a < jsonArray.length(); a++) {
                                     JSONObject jsonObjectItem = jsonArray.getJSONObject(a);
-                                    String name = jsonObjectItem.getString("name");
-                                    String character = jsonObjectItem.getString("character");
-                                    String player = name + " as " + character;
+                                    String player = "";
+                                    if (!jsonObjectItem.getString("character").equals("")) {
+                                        String name = jsonObjectItem.getString("name");
+                                        String character = jsonObjectItem.getString("character");
+                                        player = name + " as " + character;
+                                    } else {
+                                        player = jsonObjectItem.getString("name");
+                                    }
                                     listPlayers.add(player);
                                 }
-                                emitter.onNext(listPlayers);
+                                String duration = databaseManagerHelper.getRowTbKV(
+                                        StringSource.colomnKeyValue,
+                                        id
+                                );
+                                if (duration.equals("")) {
+                                    requestToGetDuration(
+                                            id,
+                                            emitter,
+                                            listPlayers
+                                    );
+                                } else {
+                                    jsonObjectData.put("listPlayers", listPlayers);
+                                    jsonObjectData.put("duration", duration);
+                                    emitter.onNext(jsonObjectData);
+                                    emitter.onComplete();
+                                }
+                            } catch (Exception ex) {
+                                emitter.onError(new Throwable(""));
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void requestToGetDuration(
+            final String id,
+            final ObservableEmitter<JSONObject> emitter,
+            final List<String> listPlayers
+    ) {
+        final Request request = new Request.Builder()
+                .url(StringSource.BASE_GET_MOVIE + id + StringSource.GET_DETAIL)
+                .build();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .readTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .writeTimeout(1000 * 180, TimeUnit.MILLISECONDS)
+                .build();
+        client.newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responMessage = response.body().string();
+                        JSONObject jsonObjectData = new JSONObject();
+                        if (response.code() == 200) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(responMessage);
+                                String runtimeTemp = String.valueOf(jsonObject.get("runtime"));
+                                String duration = "0";
+                                if (!runtimeTemp.equals("null")) {
+                                    int runtime = jsonObject.getInt("runtime");
+                                    duration = String.valueOf(runtime);
+                                    databaseManagerHelper.insertToTbKV(
+                                            StringSource.colomnKeyValue,
+                                            id,
+                                            duration
+                                    );
+                                }
+                                jsonObjectData.put("listPlayers", listPlayers);
+                                jsonObjectData.put("duration", duration);
+                                emitter.onNext(jsonObjectData);
                                 emitter.onComplete();
                             } catch (Exception ex) {
                                 emitter.onError(new Throwable(""));
@@ -305,5 +413,44 @@ public class ProviderObservables {
                         }
                     }
                 });
+    }
+
+    public Observable<HashMap<String, Object>> saveMovieToFavoriteDatabase(
+            final Movie movie,
+            final int movieCode,
+            final String filter
+    ) {
+        return Observable.create(new ObservableOnSubscribe<HashMap<String, Object>>() {
+            @Override
+            public void subscribe(ObservableEmitter<HashMap<String, Object>> emitter) throws Exception {
+                List<Movie> list = new ArrayList<>();
+                list.add(movie);
+                if (movieCode == 1) {
+                    databaseManagerHelper.insertMovieToDatabase(
+                            StringSource.colomnFavorites,
+                            list
+                    );
+                } else {
+                    databaseManagerHelper.deleteRow(
+                            movie.getId(),
+                            StringSource.colomnFavorites
+                    );
+                }
+                if (filter.equals("favorite")) {
+                    List<Movie> listAllMovie = databaseManagerHelper.getAllMovieFromDatabase(
+                            StringSource.colomnFavorites
+                    );
+                    List<Integer> listType = new ArrayList<>();
+                    for (Movie movie : listAllMovie) {
+                        listType.add(MOVIE_CONTENT);
+                    }
+                    HashMap<String, Object> hasmap = new HashMap<>();
+                    hasmap.put("listMovie", listAllMovie);
+                    hasmap.put("listType", listType);
+                    emitter.onNext(hasmap);
+                    emitter.onComplete();
+                }
+            }
+        }).subscribeOn(Schedulers.io());
     }
 }

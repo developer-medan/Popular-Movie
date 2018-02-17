@@ -33,15 +33,21 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(StringSource.CREATE_TABLE_KEY_VALUE);
-        db.execSQL(StringSource.CREATE_TABLE_MOVIE);
+        db.execSQL(StringSource.CREATE_TABLE_MOVIE_NOW_PLAYING);
+        db.execSQL(StringSource.CREATE_TABLE_MOVIE_POPULAR);
+        db.execSQL(StringSource.CREATE_TABLE_MOVIE_COMING_SOON);
         db.execSQL(StringSource.CREATE_TABLE_GENRES);
+        db.execSQL(StringSource.CREATE_TABLE_MOVIE_FAVORITE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_KEY_VALUE);
         db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_MOVIE);
+        db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_POPULAR);
+        db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_COMING_SOON);
         db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_GENRES);
+        db.execSQL("DROP TABLE IF EXISTS " + StringSource.TABLE_FAVORITE);
         onCreate(db);
     }
 }

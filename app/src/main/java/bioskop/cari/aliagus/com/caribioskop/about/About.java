@@ -7,9 +7,11 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.TextView;
 
+import bioskop.cari.aliagus.com.caribioskop.BuildConfig;
 import bioskop.cari.aliagus.com.caribioskop.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,6 +26,8 @@ public class About extends BottomSheetDialogFragment {
     @BindView(R.id.container_about)
     ConstraintLayout constraintLayoutContainerFragment;
     private Context context;
+    @BindView(R.id.version_name_about)
+    TextView textViewVersionName;
 
     @Override
     public void setupDialog(Dialog dialog, int style) {
@@ -49,15 +53,17 @@ public class About extends BottomSheetDialogFragment {
                 //nothing
             }
         });
-        constraintLayoutContainerFragment.post(new Runnable() {
-            @Override
-            public void run() {
-                int heightCoodinatorLayoutCountainer = constraintLayoutContainerFragment
-                        .getHeight();
-                Log.d("test", String.valueOf(heightCoodinatorLayoutCountainer));
-                ((BottomSheetBehavior) behavior).setPeekHeight(heightCoodinatorLayoutCountainer);
-            }
-        });
+        View parent = (View) view.getParent();
+        parent.setFitsSystemWindows(true);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(parent);
+        view.measure(0, 0);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int screenHeight = displaymetrics.heightPixels;
+        bottomSheetBehavior.setPeekHeight(screenHeight);
+        layoutParams.height = screenHeight;
+        parent.setLayoutParams(layoutParams);
+        textViewVersionName.setText(BuildConfig.VERSION_NAME);
     }
 
     public void setContext(Context context) {

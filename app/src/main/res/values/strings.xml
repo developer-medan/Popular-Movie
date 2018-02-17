@@ -23,4 +23,6 @@
     <string name="pressCancel">Press Button Cancel</string>
     <string name="error_trailler">Something error...</string>
     <string name="players_content_detail">Players :</string>
+    <string name="favorite">Favorite</string>
+    <string name="no_favorite">You Have No Favorite</string>
 </resources>

@@ -15,4 +15,10 @@
     <dimen name="logo_dimen_lan">150dp</dimen>
     <dimen name="logo_dimen_ver">75dp</dimen>
     <dimen name="fourty">40dp</dimen>
+    <dimen name="two_houndred">200dp</dimen>
+    <dimen name="one_five_zero">150dp</dimen>
+    <dimen name="one_zero_zero">100dp</dimen>
+    <dimen name="dimen_twenty_five">25sp</dimen>
+    <dimen name="dimen_therty">30dp</dimen>
+    <dimen name="fourteen">14sp</dimen>
 </resources>

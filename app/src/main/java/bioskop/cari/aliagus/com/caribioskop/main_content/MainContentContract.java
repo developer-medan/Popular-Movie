@@ -8,6 +8,8 @@ public interface MainContentContract {
 
     interface View {
         void showToastFragment(String message);
+
+        void notifyPosition(Integer position);
     }
 
     interface Presenter {

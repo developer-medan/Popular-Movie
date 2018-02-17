@@ -10,7 +10,12 @@ import bioskop.cari.aliagus.com.caribioskop.model.Movie;
 
 public interface DetailFragmentContract {
     interface View {
-        void loadDataToView(List<String> listGenres, List<String> listPlayers);
+        void loadDataToView(
+                List<String> listGenres,
+                List<String> listPlayers,
+                String duration,
+                boolean isFavorite
+        );
 
         void showToast();
     }
@@ -19,6 +24,8 @@ public interface DetailFragmentContract {
         void loadData(Movie movie);
 
         void getDataTrailler(String id);
+
+        void addOrRemoveMovie(Movie movie, int addMovie);
     }
 
 }

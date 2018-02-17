@@ -1,6 +1,7 @@
 package bioskop.cari.aliagus.com.caribioskop.fragment_content;
 
 import android.content.Context;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,8 @@ public class ContentMovieFragmentPresenter implements ContentMovieFragmentContra
     }
 
     @Override
-    public void loadData(String urlData) {
-        Observable<HashMap<String, Object>> observable = providerObservables.getObservableMovie(urlData);
+    public void loadData(String urlData, String filter) {
+        Observable<HashMap<String, Object>> observable = providerObservables.getObservableMovie(urlData, filter);
         observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<HashMap<String, Object>>() {
@@ -46,7 +47,8 @@ public class ContentMovieFragmentPresenter implements ContentMovieFragmentContra
                     public void onNext(HashMap<String, Object> map) {
                         view.loadDataToAdapter(
                                 (List<Movie>) map.get("listMovie"),
-                                (List<Integer>) map.get("listType")
+                                (List<Integer>) map.get("listType"),
+                                (String) map.get("message")
                         );
                     }
 
@@ -60,5 +62,37 @@ public class ContentMovieFragmentPresenter implements ContentMovieFragmentContra
 
                     }
                 });
+    }
+
+    @Override
+    public void saveOrRemoveMovieToFavorite(View view1, int movieCode, String filter) {
+        Movie movie = (Movie) view1.getTag();
+        Observable<HashMap<String, Object>> observable = providerObservables.saveMovieToFavoriteDatabase(movie, movieCode, filter);
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<HashMap<String, Object>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(HashMap<String, Object> map) {
+                        view.refreshAdapter(
+                                (List<Movie>) map.get("listMovie"),
+                                (List<Integer>) map.get("listType")
+                        );
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
     }
 }

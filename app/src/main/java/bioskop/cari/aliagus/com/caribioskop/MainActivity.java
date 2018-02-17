@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,13 +12,12 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import bioskop.cari.aliagus.com.caribioskop.main_content.MainContentActivity;
 import bioskop.cari.aliagus.com.caribioskop.toast.ToastFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity implements MainActivityContract.View {
 
@@ -32,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     private static final int PERMISSION_REQUEST_CODE = 101;
     private AlertDialog pDialog;
     ToastFragment toastFragment;
+    @BindView(R.id.version_name)
+    TextView textViewAppVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     }
 
     private void hideNavigationBar() {
+        String versionName = BuildConfig.VERSION_NAME;
+        textViewAppVersion.setText(versionName);
         mConstraintLayout = (ConstraintLayout) findViewById(R.id.mainContainer);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mConstraintLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 getSupportFragmentManager(),
                 toastFragment.getTag()
         );
-        toastFragment.setCancelable(false);
     }
 
     public void checkToasFragment() {

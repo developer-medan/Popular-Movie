@@ -9,31 +9,56 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/linear_image_content"
         android:id="@+id/relatif_layout_image_content"
-        android:background="@drawable/background_gradient"
-        android:elevation="@dimen/dimen_five"
         >
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/linear_image_content"
+            android:layout_height="210dp"
             android:padding="1dp"
             android:id="@+id/image_content"
             android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
             />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/background_textview"
+            android:layout_below="@+id/image_content"
+            >
+            app:layout_constraintTop_toBottomOf="@+id/relatif_layout_image_content"
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fourty"
+                android:id="@+id/title_content"
+                android:hint="@string/title_content"
+                android:textSize="@dimen/fourteen"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_weight="@integer/weight_one"
+                android:textColor="@android:color/white"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_therty"
+                android:id="@+id/image_favorite_white_not_full"
+                android:layout_weight="@integer/weight_fourth"
+                android:src="@drawable/ic_favorite_white_not_full24dp"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_therty"
+                android:id="@+id/image_favorite_white_full"
+                android:layout_weight="@integer/weight_fourth"
+                android:src="@drawable/ic_favorite_white_full_24dp"
+                android:visibility="gone"
+                />
+        </LinearLayout>
+
     </RelativeLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/fifty"
-        android:id="@+id/title_content"
-        android:hint="@string/title_content"
-        android:textSize="@dimen/dimen_sixty"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:background="@drawable/background_textview"
-        app:layout_constraintTop_toBottomOf="@+id/relatif_layout_image_content"
-        />
-
 
 </android.support.constraint.ConstraintLayout>

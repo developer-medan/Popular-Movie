@@ -33,21 +33,27 @@
             >
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/fourty"
                 android:id="@+id/txt_cancel"
                 android:layout_alignParentLeft="true"
                 android:text="@string/cancel"
                 android:textSize="@dimen/standart_content_detail_text"
+                android:gravity="center"
+                android:padding="@dimen/two"
+                android:background="@drawable/background_textview"
                 android:textColor="@android:color/white"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/fourty"
                 android:id="@+id/txt_refresh"
                 android:layout_alignParentRight="true"
                 android:text="@string/refresh"
                 android:textSize="@dimen/standart_content_detail_text"
+                android:gravity="center"
+                android:padding="@dimen/two"
+                android:background="@drawable/background_textview"
                 android:textColor="@android:color/white"
                 />
         </RelativeLayout>

@@ -10,6 +10,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import bioskop.cari.aliagus.com.caribioskop.lib.StringSource;
@@ -38,26 +39,28 @@ public class DatabaseManagerHelper extends DatabaseHelper {
         return instance;
     }
 
-    public void bulkInsertMovieToDatabase(List<Movie> movieList) {
+    public void bulkInsertMovieToDatabase(List<Movie> movieList, String[] arrayStringColomn) {
         SQLiteDatabase db = databaseManager.openDatabase(TAG);
         String query = "INSERT OR REPLACE INTO "
-                + StringSource.colomnMovie[0] +
+                + arrayStringColomn[0] +
                 "("
-                + StringSource.colomnMovie[1] +
+                + arrayStringColomn[2] +
                 ", "
-                + StringSource.colomnMovie[2] +
+                + arrayStringColomn[3] +
                 ", "
-                + StringSource.colomnMovie[3] +
+                + arrayStringColomn[4] +
                 ", "
-                + StringSource.colomnMovie[4] +
+                + arrayStringColomn[5] +
                 ", "
-                + StringSource.colomnMovie[5] +
+                + arrayStringColomn[6] +
                 ", "
-                + StringSource.colomnMovie[6] +
+                + arrayStringColomn[7] +
                 ", "
-                + StringSource.colomnMovie[7] +
+                + arrayStringColomn[8] +
+                ", "
+                + arrayStringColomn[9] +
                 ") "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?) ";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
         try {
             db.beginTransaction();
             SQLiteStatement stmt = db.compileStatement(query);
@@ -70,6 +73,7 @@ public class DatabaseManagerHelper extends DatabaseHelper {
                 stmt.bindString(5, movie.getOverView());
                 stmt.bindString(6, movie.getPosterPath());
                 stmt.bindString(7, movie.getReleaseDate());
+                stmt.bindString(8, String.valueOf(movie.getGenresList()));
                 stmt.execute();
             }
             db.setTransactionSuccessful();
@@ -102,18 +106,25 @@ public class DatabaseManagerHelper extends DatabaseHelper {
     private Movie getMovieByKey(String[] arrayColomn, String key) {
         SQLiteDatabase sqLiteDatabase = databaseManager.openDatabase(TAG);
         String selectQuery = "SELECT * FROM " + arrayColomn[0] + " WHERE "
-                + arrayColomn[1] + " = '" + key + "'";
+                + arrayColomn[2] + " = '" + key + "'";
         Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
         Movie movie = new Movie();
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
-            movie.setId(cursor.getString(cursor.getColumnIndex(arrayColomn[1])));
-            movie.setTitle(cursor.getString(cursor.getColumnIndex(arrayColomn[2])));
-            movie.setVoteAverage(cursor.getString(cursor.getColumnIndex(arrayColomn[3])));
-            movie.setPopularity(cursor.getString(cursor.getColumnIndex(arrayColomn[4])));
-            movie.setOverView(cursor.getString(cursor.getColumnIndex(arrayColomn[5])));
-            movie.setPosterPath(cursor.getString(cursor.getColumnIndex(arrayColomn[6])));
-            movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(arrayColomn[7])));
+            String genres = cursor.getString(cursor.getColumnIndex(arrayColomn[9]));
+            genres = genres.replaceAll("\\[", "");
+            genres = genres.replaceAll("]", "");
+            genres = genres.trim();
+            String[] genresArray = genres.split(",");
+            List<String> listGenres = new ArrayList<>(Arrays.asList(genresArray));
+            movie.setId(cursor.getString(cursor.getColumnIndex(arrayColomn[2])));
+            movie.setTitle(cursor.getString(cursor.getColumnIndex(arrayColomn[3])));
+            movie.setVoteAverage(cursor.getString(cursor.getColumnIndex(arrayColomn[4])));
+            movie.setPopularity(cursor.getString(cursor.getColumnIndex(arrayColomn[5])));
+            movie.setOverView(cursor.getString(cursor.getColumnIndex(arrayColomn[6])));
+            movie.setPosterPath(cursor.getString(cursor.getColumnIndex(arrayColomn[7])));
+            movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(arrayColomn[8])));
+            movie.setGenresList(listGenres);
         } else {
             movie.setId("");
             movie.setTitle("");
@@ -122,12 +133,13 @@ public class DatabaseManagerHelper extends DatabaseHelper {
             movie.setOverView("");
             movie.setPosterPath("");
             movie.setReleaseDate("");
+            movie.setGenresList(new ArrayList<String>());
         }
         cursor.close();
         return movie;
     }
 
-    private List<String> getListId(String[] arrayColomn) {
+    public List<String> getListId(String[] arrayColomn) {
         SQLiteDatabase sqLiteDatabase = databaseManager.openDatabase(TAG);
         String selectQuery = "SELECT * FROM " + arrayColomn[0];
         Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
@@ -135,7 +147,7 @@ public class DatabaseManagerHelper extends DatabaseHelper {
         if (cursor.getCount() > 0) {
             if (cursor.moveToFirst()) {
                 do {
-                    listIdMovie.add(cursor.getString(cursor.getColumnIndex(arrayColomn[1])));
+                    listIdMovie.add(cursor.getString(cursor.getColumnIndex(arrayColomn[2])));
                 } while (cursor.moveToNext());
             }
         }
@@ -204,11 +216,11 @@ public class DatabaseManagerHelper extends DatabaseHelper {
 
     public String getRowTbKV(
             String[] arrayStrings,
-            String lastUpdate
+            String key
     ) {
         SQLiteDatabase db = databaseManager.openDatabase(TAG);
         String selectQuery = "SELECT * FROM " + arrayStrings[0] + " WHERE "
-                + arrayStrings[1] + " = '" + lastUpdate + "'";
+                + arrayStrings[1] + " = '" + key + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         String value = "";
         if (cursor.getCount() > 0) {
@@ -221,47 +233,69 @@ public class DatabaseManagerHelper extends DatabaseHelper {
 
     public void insertToTbKV(
             String[] arrayStrings,
-            String lastUpdate,
-            String currentDateString
+            String key,
+            String value
     ) {
         SQLiteDatabase db = databaseManager.openDatabase(TAG);
         ContentValues cv = new ContentValues();
-        cv.put(arrayStrings[1], lastUpdate);
-        cv.put(arrayStrings[2], currentDateString);
-        String date = getRowTbKV(arrayStrings, lastUpdate);
-        if (date.equals("")) {
+        cv.put(arrayStrings[1], key);
+        cv.put(arrayStrings[2], value);
+        String result = getRowTbKV(arrayStrings, key);
+        if (result.equals("")) {
             db.insert(arrayStrings[0], null, cv);
-        } else if (!date.equals(currentDateString)) {
-            Log.d("waktu", date);
-            Log.d("waktu now", currentDateString);
-            Long time = Long.valueOf(date);
-            Long now = Long.valueOf(currentDateString);
-            Long timeNow = now - time;
-            Log.d("waktu time now", String.valueOf(timeNow));
-            if (timeNow >= 600000) {
-                deleteRowTableById(StringSource.colomnMovie);
-                String where = arrayStrings[1] + " = ?";
-                String[] args = {lastUpdate};
-                db.update(arrayStrings[0], cv, where, args);
-
+        } else if (!result.equals("") && !result.equals(value)) {
+                Long time = Long.valueOf(result);
+                Long now = Long.valueOf(value);
+                Long timeNow = now - time;
+                if (timeNow >= 600000) {
+                    deleteRowTableById();
+                    String where = arrayStrings[1] + " = ?";
+                    String[] args = {key};
+                    db.update(arrayStrings[0], cv, where, args);
             }
         }
 
     }
 
-    private void deleteRowTableById(String[] arrayStrings) {
-        List<String> listId = getListId(arrayStrings);
-        if (listId.size() > 0) {
-            for (String id : listId) {
-                deleteRow(id, arrayStrings);
+    private void deleteRowTableById() {
+        List<String[]> listAllTable = StringSource.LIST_ALL_TABLE();
+        for (String[] arrayStrings : listAllTable) {
+            List<String> listId = getListId(arrayStrings);
+            if (listId.size() > 0) {
+                for (String id : listId) {
+                    deleteRow(id, arrayStrings);
+                    Log.d(TAG, "deleted " + id +" " + arrayStrings[0]);
+                }
             }
         }
     }
 
-    private void deleteRow(String id, String[] arrayStrings) {
-        SQLiteDatabase sqLiteOpenHelper = databaseManager.openDatabase(TAG);
-        String where = arrayStrings[1] + "= ?";
+    public void deleteRow(String id, String[] arrayStrings) {
+        SQLiteDatabase sqLiteDatabase = databaseManager.openDatabase(TAG);
+        String where = arrayStrings[2] + "= ?";
         String[] args = {id};
-        sqLiteOpenHelper.delete(arrayStrings[0], where, args);
+        sqLiteDatabase.delete(arrayStrings[0], where, args);
+    }
+
+    public void insertMovieToDatabase(
+            String[] arrayStrings,
+            List<Movie> listMovie
+    ) {
+        List<String> listId = getListId(arrayStrings);
+        SQLiteDatabase sqLiteDatabase = databaseManager.openDatabase(TAG);
+        for (Movie movie : listMovie) {
+            if (!listId.contains(movie.getId())) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(arrayStrings[2], movie.getId());
+                contentValues.put(arrayStrings[3], movie.getTitle());
+                contentValues.put(arrayStrings[4], movie.getVoteAverage());
+                contentValues.put(arrayStrings[5], movie.getPopularity());
+                contentValues.put(arrayStrings[6], movie.getOverView());
+                contentValues.put(arrayStrings[7], movie.getPosterPath());
+                contentValues.put(arrayStrings[8], movie.getReleaseDate());
+                contentValues.put(arrayStrings[9], String.valueOf(movie.getGenresList()));
+                sqLiteDatabase.insert(arrayStrings[0], null, contentValues);
+            }
+        }
     }
 }

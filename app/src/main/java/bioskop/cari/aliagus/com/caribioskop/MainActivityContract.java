@@ -14,6 +14,7 @@ public interface MainActivityContract {
 
     interface Presenter {
         void getAllGenresMovie();
+
     }
 
 }

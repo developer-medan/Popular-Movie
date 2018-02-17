@@ -11,13 +11,19 @@ import bioskop.cari.aliagus.com.caribioskop.model.Movie;
 public interface ContentMovieFragmentContract {
     interface View {
 
-        void loadDataToAdapter(List<Movie> listMovie, List<Integer> listType);
+        void loadDataToAdapter(List<Movie> listMovie, List<Integer> listType, String message);
 
         void showToastFragment(String message);
+
+        void refreshAdapter(List<Movie> listMovie, List<Integer> listType);
+
+        void refreshAdapterPosition(Integer position);
     }
 
     interface Presenter {
-        void loadData(String urlData);
+        void loadData(String urlData, String filter);
+
+        void saveOrRemoveMovieToFavorite(android.view.View view, int movieCode, String filter);
     }
 
 }

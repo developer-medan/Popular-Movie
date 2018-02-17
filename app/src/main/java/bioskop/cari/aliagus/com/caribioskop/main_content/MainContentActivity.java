@@ -1,6 +1,5 @@
 package bioskop.cari.aliagus.com.caribioskop.main_content;
 
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,17 +18,16 @@ import java.util.ArrayList;
 
 import bioskop.cari.aliagus.com.caribioskop.R;
 import bioskop.cari.aliagus.com.caribioskop.about.About;
-import bioskop.cari.aliagus.com.caribioskop.database.InspectionDatabase;
 import bioskop.cari.aliagus.com.caribioskop.fragment_content.ContentMovieFragment;
 import bioskop.cari.aliagus.com.caribioskop.lib.StringSource;
 import bioskop.cari.aliagus.com.caribioskop.toast.ToastFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainContentActivity extends AppCompatActivity implements MainContentContract.View,
-        View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
+        BottomNavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = MainContentActivity.class.getSimpleName();
     private MainContentActivityPresenter mPresenter;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView mBottomNavigationView;
@@ -36,6 +35,7 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
     boolean isMainContent = true;
     private About about;
     private ToastFragment toastFragment;
+    private ContentMovieFragment contentMovieFragment;
 
 
     @Override
@@ -45,6 +45,7 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
         ButterKnife.bind(this);
         initPresenter();
         initBottomNavigation();
+        Log.d(TAG, "created");
     }
 
     private void initBottomNavigation() {
@@ -62,13 +63,15 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
                             @Override
                             public void onGlobalLayout() {
                                 mBottomNavigationView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                for (int a = 0; a < 3; a++) {
+                                for (int a = 0; a < 4; a++) {
                                     String id = "";
                                     if (a == 0) {
                                         id = "bottom_navigation_now_playing";
                                     } else if (a == 1) {
                                         id = "botton_navigation_popular";
                                     } else if (a == 2) {
+                                        id = "bottom_navigation_favorite";
+                                    } else if (a == 3) {
                                         id = "botton_navigation_comming_soon";
                                     }
                                     MenuItem menuItem = menuNavBottom.findItem(getResources().getIdentifier(id, "id", getPackageName()));
@@ -86,25 +89,16 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
         mPresenter = new MainContentActivityPresenter(this);
     }
 
-    @OnClick({
-    })
-    public void onClick(View view) {
-        Intent intent = new Intent(MainContentActivity.this, InspectionDatabase.class);
-        startActivity(intent);
-        switch (view.getId()) {
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        attachFagmentToActivity(StringSource.GET_NOW_PLAYING_MOVIE);
         setTitle(R.string.now_playing);
         mBottomNavigationView.setSelectedItemId(R.id.bottom_navigation_now_playing);
     }
 
-    private void attachFagmentToActivity(String urlData) {
-        ContentMovieFragment contentMovieFragment = new ContentMovieFragment();
+    private void attachFagmentToActivity(String urlData, String filter) {
+        contentMovieFragment = new ContentMovieFragment();
+        contentMovieFragment.setFilter(filter);
         contentMovieFragment.setUrlData(urlData);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout_content_activity, contentMovieFragment)
@@ -115,20 +109,26 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.botton_navigation_comming_soon:
-                attachFagmentToActivity(StringSource.GET_COMING_SOON_MOVIE);
+                attachFagmentToActivity(StringSource.GET_COMING_SOON_MOVIE, "soon");
                 setTitle(R.string.coming_soon);
                 isMainContent = true;
                 break;
 
             case R.id.botton_navigation_popular:
-                attachFagmentToActivity(StringSource.GET_POPULAR_MOVIE);
+                attachFagmentToActivity(StringSource.GET_POPULAR_MOVIE, "popular");
                 setTitle(R.string.popular_movie);
                 isMainContent = true;
                 break;
 
             case R.id.bottom_navigation_now_playing:
-                attachFagmentToActivity(StringSource.GET_NOW_PLAYING_MOVIE);
+                attachFagmentToActivity(StringSource.GET_NOW_PLAYING_MOVIE, "now");
                 setTitle(R.string.now_playing);
+                isMainContent = true;
+                break;
+
+            case R.id.bottom_navigation_favorite:
+                attachFagmentToActivity(StringSource.GET_TRAILLER, "favorite");
+                setTitle(R.string.favorite);
                 isMainContent = true;
                 break;
         }
@@ -152,10 +152,6 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
                         about.getTag()
                 );
                 break;
-
-            case R.id.test:
-                Intent intent = new Intent(MainContentActivity.this, InspectionDatabase.class);
-                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -174,7 +170,11 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
                 getSupportFragmentManager(),
                 toastFragment.getTag()
         );
-        toastFragment.setCancelable(false);
+    }
+
+    @Override
+    public void notifyPosition(Integer position) {
+        contentMovieFragment.refreshAdapterPosition(position);
     }
 
     public void resumeActivity() {
@@ -193,4 +193,5 @@ public class MainContentActivity extends AppCompatActivity implements MainConten
         super.onPause();
         checkToastFragment();
     }
+
 }
